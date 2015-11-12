@@ -105,7 +105,6 @@ class B2Client
      *
      * @throws B2Exception
      *
-     * @internal string $sha1 The SHA1 checksum of the content of the file.
      */
     public function b2UploadFile($path, $uploadURL, $token, $fileName, $lastModified = null, $contentType = 'b2/x-auto', $params = array())
     {
