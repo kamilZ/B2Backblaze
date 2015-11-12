@@ -1,5 +1,5 @@
 {
-  "name": "kamilZ/B2Backblaze",
+  "name": "kamilz/b2backblaze",
   "description": "PHP5 libreary that provides an API for B2 Cloud Storage",
   "keywords":  ["api", "b2", "file", "php", "storage"],
   "minimum-stability": "dev",
@@ -14,12 +14,6 @@
     {
       "name": "The contributors",
       "homepage": "http://github.com/kamilZ/B2Backblaze/contributors"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "pear",
-      "url": "http://pear.php.net"
     }
   ],
   "require": {
