@@ -1,6 +1,6 @@
 {
   "name": "kamilz/b2backblaze",
-  "description": "PHP5 libreary that provides an API for B2 Cloud Storage",
+  "description": "PHP5 library that provides an API for B2 Cloud Storage",
   "keywords":  ["api", "b2", "file", "php", "storage"],
   "minimum-stability": "dev",
   "homepage": "https://github.com/kamilZ",
