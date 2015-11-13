@@ -84,9 +84,6 @@ class B2Client
         return json_decode($response->getContent(), true);
     }
 
-
-
-
     /**
      * Creates a new bucket. A bucket belongs to the account used to create it.
      * Buckets can be named. The name must be globally unique. No account can use a bucket with the same name.
@@ -95,25 +92,29 @@ class B2Client
      * @param String $URL    Obtained from b2AuthorizeAccount call
      * @param String $token  Obtained from b2AuthorizeAccount call
      * @param String $name   6 char min, 50 char max: letters, digits, - and _
-     * @param bool $public
+     * @param bool   $public
+     *
      * @return array Example:
-     *              {
-     *                  "bucketId" : "4a48fe8875c6214145260818",
-     *                  "accountId" : "010203040506",
-     *                  "bucketName" : "any_name_you_pick",
-     *                  "bucketType" : "allPrivate"
-     *              }
+     *               {
+     *               "bucketId" : "4a48fe8875c6214145260818",
+     *               "accountId" : "010203040506",
+     *               "bucketName" : "any_name_you_pick",
+     *               "bucketType" : "allPrivate"
+     *               }
+     *
      * @throws B2Exception
      */
     public function b2CreateBucket($URL, $token, $name, $public = false)
     {
-        if(count_chars($name) < 5 && count_chars($name) > 50) throw new B2Exception("Invalid bucket name");
+        if (count_chars($name) < 5 && count_chars($name) > 50) {
+            throw new B2Exception('Invalid bucket name');
+        }
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
         $payload = json_encode(array(
             'accountId' => $this->accountId,
             'bucketName' => $name,
-            'bucketType' => $public?"allPublic":"allPrivate",
+            'bucketType' => $public ? 'allPublic' : 'allPrivate',
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_create_bucket', $this->getHeaders($token), $payload);
 
@@ -123,16 +124,18 @@ class B2Client
     /**
      * Deletes the bucket specified. Only buckets that contain no version of any files can be deleted.
      *
-     * @param String $URL        Obtained from b2AuthorizeAccount call
-     * @param String $token      Obtained from b2AuthorizeAccount call
-     * @param String $bucketId   The ID of the bucket you want to delete
+     * @param String $URL      Obtained from b2AuthorizeAccount call
+     * @param String $token    Obtained from b2AuthorizeAccount call
+     * @param String $bucketId The ID of the bucket you want to delete
+     *
      * @return array Example:
-     *              {
-     *                  "bucketId" : "4a48fe8875c6214145260818",
-     *                  "accountId" : "010203040506",
-     *                  "bucketName" : "any_name_you_pick",
-     *                  "bucketType" : "allPrivate"
-     *              }
+     *               {
+     *               "bucketId" : "4a48fe8875c6214145260818",
+     *               "accountId" : "010203040506",
+     *               "bucketName" : "any_name_you_pick",
+     *               "bucketType" : "allPrivate"
+     *               }
+     *
      * @throws B2Exception
      */
     public function b2DeleteBucket($URL, $token, $bucketId)
@@ -141,7 +144,7 @@ class B2Client
         $browser = new Browser($curl);
         $payload = json_encode(array(
             'accountId' => $this->accountId,
-            'bucketId' => $bucketId
+            'bucketId' => $bucketId,
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_delete_bucket', $this->getHeaders($token), $payload);
 
@@ -154,15 +157,17 @@ class B2Client
      * then the most recent older version will become the current version,
      * and be the one that you'll get when downloading by name.
      *
-     * @param String $URL        Obtained from b2AuthorizeAccount call
-     * @param String $token      Obtained from b2AuthorizeAccount call
-     * @param String $fileId     The ID of the file you want to delete
-     * @param String $fileName   The file name of the file you want to delete
+     * @param String $URL      Obtained from b2AuthorizeAccount call
+     * @param String $token    Obtained from b2AuthorizeAccount call
+     * @param String $fileId   The ID of the file you want to delete
+     * @param String $fileName The file name of the file you want to delete
+     *
      * @return array Example:
-     *              {
-     *                  "fileId" : "4_h4a48fe8875c6214145260818_f000000000000472a_d20140104_m032022_c001_v0000123_t0104",
-     *                  "fileName" : "typing_test.txt"
-     *              }
+     *               {
+     *               "fileId" : "4_h4a48fe8875c6214145260818_f000000000000472a_d20140104_m032022_c001_v0000123_t0104",
+     *               "fileName" : "typing_test.txt"
+     *               }
+     *
      * @throws B2Exception
      */
     public function b2DeleteFileVersion($URL, $token, $fileId, $fileName)
@@ -171,7 +176,7 @@ class B2Client
         $browser = new Browser($curl);
         $payload = json_encode(array(
             'fileId' => $fileId,
-            'fileName' => $fileName
+            'fileName' => $fileName,
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_delete_file_version', $this->getHeaders($token), $payload);
 
@@ -184,106 +189,110 @@ class B2Client
      * then the most recent older version will become the current version,
      * and be the one that you'll get when downloading by name.
      *
-     * @param String $downloadURL  Obtained from b2GetUploadURL call
-     * @param String $fileId       The ID of the file you want to delete
-     * @param boolean $download    Return URL or download directly
+     * @param String $downloadURL Obtained from b2GetUploadURL call
+     * @param String $fileId      The ID of the file you want to delete
+     * @param bool   $download    Return URL or download directly
+     *
      * @return mixed|String
+     *
      * @throws B2Exception
      */
     public function b2DownloadFileById($downloadURL, $fileId, $download = false)
     {
-        $url = $downloadURL. "/b2api/v1/b2_download_file_by_id?fileId=".urlencode($fileId);
-        if(!$download){
+        $url = $downloadURL.'/b2api/v1/b2_download_file_by_id?fileId='.urlencode($fileId);
+        if (!$download) {
             return $url;
         }
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
+
         return $browser->get($url)->getContent();
     }
-
 
     /**
      * Downloads one file by providing the name of the bucket and the name of the file.
      *
      *
-     * @param String $downloadURL  Obtained from b2GetUploadURL call
-     * @param string $bucketName   The bucket name of file
-     * @param string $fileName     The name of the file, in percent-encoded UTF-8
-     * @param string $token        Can be null if your bucket is public otherwise An upload authorization token from authorization request
+     * @param String $downloadURL Obtained from b2GetUploadURL call
+     * @param string $bucketName  The bucket name of file
+     * @param string $fileName    The name of the file, in percent-encoded UTF-8
+     * @param string $token       Can be null if your bucket is public otherwise An upload authorization token from authorization request
+     *
      * @return mixed
      *
      * @throws B2Exception
-     *
      */
     public function b2DownloadFileByName($downloadURL, $bucketName, $fileName, $token = null)
     {
-        $uri = $downloadURL. "/file/". $bucketName ."/".urlencode($fileName);
+        $uri = $downloadURL.'/file/'.$bucketName.'/'.urlencode($fileName);
         $curl = $this->prepareCurl();
 
-        if(is_null($token)){
+        if (is_null($token)) {
             $curl->setVerifyPeer(false); // ensure it.
         }
         $browser = new Browser($curl);
-        if(is_null($token)){
+        if (is_null($token)) {
             $headers = [];
-        }else{
+        } else {
             $headers = $this->getHeaders($token);
         }
         $response = $browser->get($uri, $headers);
+
         return $response->getContent();
     }
-
 
     /**
      * Gets information about one file stored in B2.
      *
-     * @param String $URL          Obtained from b2_authorize_account call
-     * @param string $token        Obtained from b2_authorize_account call
-     * @param string $fileId       The ID of the file, in percent-encoded UTF-8
-     * @return array
-     *             {
-     *                 "accountId": "7eecc42b9675",
-     *                 "bucketId": "e73ede9c9c8412db49f60715",
-     *                 "contentLength": 122573,
-     *                 "contentSha1": "a01a21253a07fb08a354acd30f3a6f32abb76821",
-     *                 "contentType": "image/jpeg",
-     *                 "fileId": "4_ze73ede9c9c8412db49f60715_f100b4e93fbae6252_d20150824_m224353_c900_v8881000_t0001",
-     *                 "fileInfo": {},
-     *                 "fileName": "akitty.jpg"
-     *             }
-     * @throws B2Exception
+     * @param String $URL    Obtained from b2_authorize_account call
+     * @param string $token  Obtained from b2_authorize_account call
+     * @param string $fileId The ID of the file, in percent-encoded UTF-8
      *
+     * @return array
+     *               {
+     *               "accountId": "7eecc42b9675",
+     *               "bucketId": "e73ede9c9c8412db49f60715",
+     *               "contentLength": 122573,
+     *               "contentSha1": "a01a21253a07fb08a354acd30f3a6f32abb76821",
+     *               "contentType": "image/jpeg",
+     *               "fileId": "4_ze73ede9c9c8412db49f60715_f100b4e93fbae6252_d20150824_m224353_c900_v8881000_t0001",
+     *               "fileInfo": {},
+     *               "fileName": "akitty.jpg"
+     *               }
+     *
+     * @throws B2Exception
      */
     public function b2GetFileInfo($URL, $token, $fileId)
     {
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
         $payload = json_encode(array(
-            'fileId' => $fileId
+            'fileId' => $fileId,
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_get_file_info', $this->getHeaders($token), $payload);
+
         return $response->getContent();
     }
-
 
     /**
      * Hides a file so that downloading by name will not find the file,
      * but previous versions of the file are still stored.
      * See File Versions about what it means to hide a file.
      *
-     * @param String $URL          Obtained from b2_authorize_account call
-     * @param string $token        Obtained from b2_authorize_account call
-     * @param string $bucketId     The ID of the bucket
-     * @param string $fileName     The name of the file, in percent-encoded UTF-8
-     * @return array
-     *          {
-     *              "action" : "hide",
-     *              "fileId" : "4_h4a48fe8875c6214145260818_f000000000000472a_d20140104_m032022_c001_v0000123_t0104",
-     *              "fileName" : "typing_test.txt",
-     *              "uploadTimestamp" : 1437815673000
-     *          }
-     * @throws B2Exception
+     * @param String $URL      Obtained from b2_authorize_account call
+     * @param string $token    Obtained from b2_authorize_account call
+     * @param string $bucketId The ID of the bucket
+     * @param string $fileName The name of the file, in percent-encoded UTF-8
      *
+     * @return array
+     *               {
+     *               "action" : "hide",
+     *               "fileId" : "4_h4a48fe8875c6214145260818_f000000000000472a_d20140104_m032022_c001_v0000123_t0104",
+     *               "fileName" : "typing_test.txt",
+     *               "uploadTimestamp" : 1437815673000
+     *               }
+     *
+     * @throws B2Exception
      */
     public function b2HideFile($URL, $token, $bucketId, $fileName)
     {
@@ -291,46 +300,48 @@ class B2Client
         $browser = new Browser($curl);
         $payload = json_encode(array(
             'bucketId' => $bucketId,
-            'fileName' => $fileName
+            'fileName' => $fileName,
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_hide_file', $this->getHeaders($token), $payload);
+
         return $response->getContent();
     }
 
     /**
      * Lists buckets associated with an account, in alphabetical order by bucket ID.
      *
-     * @param String $URL          Obtained from b2_authorize_account call
-     * @param string $token        Obtained from b2_authorize_account call
-     * @return array {
-     *     "buckets": [
-     *     {
-     *         "bucketId": "4a48fe8875c6214145260818",
-     *         "accountId": "30f20426f0b1",
-     *         "bucketName" : "Kitten Videos",
-     *         "bucketType": "allPrivate"
-     *     },
-     *     {
-     *         "bucketId" : "5b232e8875c6214145260818",
-     *         "accountId": "30f20426f0b1",
-     *         "bucketName": "Puppy Videos",
-     *         "bucketType": "allPublic"
-     *     } (...) ]
-     * }
-     * @throws B2Exception
+     * @param String $URL   Obtained from b2_authorize_account call
+     * @param string $token Obtained from b2_authorize_account call
      *
+     * @return array {
+     *               "buckets": [
+     *               {
+     *               "bucketId": "4a48fe8875c6214145260818",
+     *               "accountId": "30f20426f0b1",
+     *               "bucketName" : "Kitten Videos",
+     *               "bucketType": "allPrivate"
+     *               },
+     *               {
+     *               "bucketId" : "5b232e8875c6214145260818",
+     *               "accountId": "30f20426f0b1",
+     *               "bucketName": "Puppy Videos",
+     *               "bucketType": "allPublic"
+     *               } (...) ]
+     *               }
+     *
+     * @throws B2Exception
      */
     public function b2ListBuckets($URL, $token)
     {
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
         $payload = json_encode(array(
-            'accountId' => $this->accountId
+            'accountId' => $this->accountId,
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_list_buckets', $this->getHeaders($token), $payload);
+
         return $response->getContent();
     }
-
 
     /**
      * Lists the names of all files in a bucket, starting at a given name.
@@ -339,37 +350,39 @@ class B2Client
      * it returns an "endFileName" that can be used as the starting point for the next call.
      *
      *
-     * @param String $URL Obtained from b2_authorize_account call
-     * @param string $token Obtained from b2_authorize_account call
-     * @param string $bucketId The ID of the bucket
+     * @param String      $URL           Obtained from b2_authorize_account call
+     * @param string      $token         Obtained from b2_authorize_account call
+     * @param string      $bucketId      The ID of the bucket
      * @param null|String $startFileName The first file name to return.
-     * @param int $maxFileCount The maximum number of files to return from this call. The default value is 100, and the maximum allowed is 1000.
+     * @param int         $maxFileCount  The maximum number of files to return from this call. The default value is 100, and the maximum allowed is 1000.
+     *
      * @return array {
-     *   "files": [
-     * {
-     * "action": "upload",
-     * "fileId": "4_z27c88f1d182b150646ff0b16_f1004ba650fe24e6b_d20150809_m012853_c100_v0009990_t0000",
-     * "fileName": "files/hello.txt",
-     * "size": 6,
-     * "uploadTimestamp": 1439083733000
-     * },
-     * {
-     * "action": "upload",
-     * "fileId": "4_z27c88f1d182b150646ff0b16_f1004ba650fe24e6c_d20150809_m012854_c100_v0009990_t0000",
-     * "fileName": "files/world.txt",
-     * "size": 6,
-     * "uploadTimestamp": 1439083734000
-     * }
-     * ],
-     * "nextFileName": null
-     * }
-     * nextFileName: What to pass in to startFileName for the next search.
+     *               "files": [
+     *               {
+     *               "action": "upload",
+     *               "fileId": "4_z27c88f1d182b150646ff0b16_f1004ba650fe24e6b_d20150809_m012853_c100_v0009990_t0000",
+     *               "fileName": "files/hello.txt",
+     *               "size": 6,
+     *               "uploadTimestamp": 1439083733000
+     *               },
+     *               {
+     *               "action": "upload",
+     *               "fileId": "4_z27c88f1d182b150646ff0b16_f1004ba650fe24e6c_d20150809_m012854_c100_v0009990_t0000",
+     *               "fileName": "files/world.txt",
+     *               "size": 6,
+     *               "uploadTimestamp": 1439083734000
+     *               }
+     *               ],
+     *               "nextFileName": null
+     *               }
+     *               nextFileName: What to pass in to startFileName for the next search.
+     *
      * @throws B2Exception
      */
     public function b2ListFileNames($URL, $token, $bucketId, $startFileName = null, $maxFileCount = 100)
     {
-        if($maxFileCount > 1000) {
-            throw new B2Exception("The maximum allowed is 1000");
+        if ($maxFileCount > 1000) {
+            throw new B2Exception('The maximum allowed is 1000');
         }
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
@@ -377,10 +390,11 @@ class B2Client
             'bucketId' => $bucketId,
             'maxFileCount' => $maxFileCount,
         );
-        if(!is_null($startFileName)){
-            $payload["startFileName"] = $startFileName;
+        if (!is_null($startFileName)) {
+            $payload['startFileName'] = $startFileName;
         }
         $response = $browser->post($URL.'/b2api/v1/b2_list_file_names', $this->getHeaders($token), json_encode($payload));
+
         return $response->getContent();
     }
 
@@ -390,65 +404,67 @@ class B2Client
      * for versions of files with the same name.
      *
      *
-     * @param String $URL Obtained from b2_authorize_account call
-     * @param string $token Obtained from b2_authorize_account call
-     * @param string $bucketId The ID of the bucket
-     * @param null|String $startFileId The first file id to return.
+     * @param String      $URL           Obtained from b2_authorize_account call
+     * @param string      $token         Obtained from b2_authorize_account call
+     * @param string      $bucketId      The ID of the bucket
+     * @param null|String $startFileId   The first file id to return.
      * @param null|String $startFileName The first file name to return.
-     * @param int $maxFileCount The maximum number of files to return from this call. The default value is 100, and the maximum allowed is 1000.
+     * @param int         $maxFileCount  The maximum number of files to return from this call. The default value is 100, and the maximum allowed is 1000.
+     *
      * @return array {
-     *   "files": [
-     *     {
-     *       "action": "upload",
-     *       "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886245_d20150809_m232316_c100_v0009990_t0003",
-     *       "fileName": "files/hello.txt",
-     *       "size": 6,
-     *       "uploadTimestamp": 1439162596000
-     *     },
-     *     {
-     *       "action": "hide",
-     *       "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886247_d20150809_m232323_c100_v0009990_t0005",
-     *       "fileName": "files/world.txt",
-     *       "size": 0,
-     *       "uploadTimestamp": 1439162603000
-     *     },
-     *     {
-     *       "action": "upload",
-     *       "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886246_d20150809_m232316_c100_v0009990_t0003",
-     *       "fileName": "files/world.txt",
-     *       "size": 6,
-     *       "uploadTimestamp": 1439162596000
-     *     }
-     *   ],
-     *   "nextFileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886247_d20150809_m232316_c100_v0009990_t0003",
-     *   "nextFileName": "files/world.txt"
-     * }
+     *               "files": [
+     *               {
+     *               "action": "upload",
+     *               "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886245_d20150809_m232316_c100_v0009990_t0003",
+     *               "fileName": "files/hello.txt",
+     *               "size": 6,
+     *               "uploadTimestamp": 1439162596000
+     *               },
+     *               {
+     *               "action": "hide",
+     *               "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886247_d20150809_m232323_c100_v0009990_t0005",
+     *               "fileName": "files/world.txt",
+     *               "size": 0,
+     *               "uploadTimestamp": 1439162603000
+     *               },
+     *               {
+     *               "action": "upload",
+     *               "fileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886246_d20150809_m232316_c100_v0009990_t0003",
+     *               "fileName": "files/world.txt",
+     *               "size": 6,
+     *               "uploadTimestamp": 1439162596000
+     *               }
+     *               ],
+     *               "nextFileId": "4_z27c88f1d182b150646ff0b16_f100920ddab886247_d20150809_m232316_c100_v0009990_t0003",
+     *               "nextFileName": "files/world.txt"
+     *               }
      *
      * nextFileId: What to pass in to startFileId for the next search.
      * nextFileName: What to pass in to startFileName for the next search.
+     *
      * @throws B2Exception
      */
     public function b2ListFileVersions($URL, $token, $bucketId, $startFileId = null, $startFileName = null, $maxFileCount = 100)
     {
-        if($maxFileCount > 1000) {
-            throw new B2Exception("The maximum allowed is 1000");
+        if ($maxFileCount > 1000) {
+            throw new B2Exception('The maximum allowed is 1000');
         }
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
         $payload = array(
             'bucketId' => $bucketId,
-            'maxFileCount' => $maxFileCount
+            'maxFileCount' => $maxFileCount,
         );
-        if(!is_null($startFileId)){
-            $payload["startFileId"] = $startFileId;
+        if (!is_null($startFileId)) {
+            $payload['startFileId'] = $startFileId;
         }
-        if(!is_null($startFileName)){
-            $payload["startFileName"] = $startFileName;
+        if (!is_null($startFileName)) {
+            $payload['startFileName'] = $startFileName;
         }
         $response = $browser->post($URL.'/b2api/v1/b2_list_file_versions', $this->getHeaders($token), json_encode($payload));
+
         return $response->getContent();
     }
-
 
     /**
      * @param string $path         File Path
@@ -472,7 +488,6 @@ class B2Client
      *               }
      *
      * @throws B2Exception
-     *
      */
     public function b2UploadFile($path, $uploadURL, $token, $fileName, $lastModified = null, $contentType = 'b2/x-auto', $params = array())
     {
@@ -503,8 +518,6 @@ class B2Client
         return json_decode($response->getContent(), true);
     }
 
-
-
     /**
      * Update an existing bucket.
      *
@@ -512,19 +525,20 @@ class B2Client
      * of the bucket without providing any authorization,
      * or to prevent anyone from downloading the contents of the bucket without providing a bucket auth token.
      *
-     * @param String $URL          Obtained from b2_authorize_account call
-     * @param string $token        Obtained from b2_authorize_account call
-     * @param string $bucketId     The ID of the bucket
-     * @param boolean $public      TRUE for public, FALSE for private.
-     * @return array
-     *          {
-     *              "bucketId" : "4a48fe8875c6214145260818",
-     *              "accountId" : "30f20426f0b1",
-     *              "bucketName" : "Kitten Videos",
-     *              "bucketType" : "allPrivate"
-     *          }
-     * @throws B2Exception
+     * @param String $URL      Obtained from b2_authorize_account call
+     * @param string $token    Obtained from b2_authorize_account call
+     * @param string $bucketId The ID of the bucket
+     * @param bool   $public   TRUE for public, FALSE for private.
      *
+     * @return array
+     *               {
+     *               "bucketId" : "4a48fe8875c6214145260818",
+     *               "accountId" : "30f20426f0b1",
+     *               "bucketName" : "Kitten Videos",
+     *               "bucketType" : "allPrivate"
+     *               }
+     *
+     * @throws B2Exception
      */
     public function b2UpdateBucket($URL, $token, $bucketId, $public)
     {
@@ -533,14 +547,12 @@ class B2Client
         $payload = json_encode(array(
             'accountId' => $this->accountId,
             'bucketId' => $bucketId,
-            'bucketType' => $public?"allPublic":"allPrivate",
+            'bucketType' => $public ? 'allPublic' : 'allPrivate',
         ));
         $response = $browser->post($URL.'/b2api/v1/b2_update_bucket', $this->getHeaders($token), $payload);
 
         return json_decode($response->getContent(), true);
     }
-
-
 
     private function getHeaders($token)
     {
