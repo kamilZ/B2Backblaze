@@ -13,11 +13,11 @@ B2 Cloud Storage?
 
 Using the B2 Cloud Storage API, you can:
 
-* Manage the configuration of your account [PENDING]
+* Manage the configuration of your account
 
-* Create and manage the buckets that hold files [PENDING]
+* Create and manage the buckets that hold files
 
-* Upload [DONE], download [PENDING], and delete files [PENDING]
+* Upload, download, and delete files
 
 
 Installation
