@@ -73,7 +73,7 @@ class B2Response
      */
     public function getHeader($key)
     {
-        return $this->response->getHeader($key, false);
+        return $this->response->getHeader($key);
     }
 
     /**
