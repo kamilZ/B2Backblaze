@@ -83,7 +83,16 @@ class B2Response
      */
     public function getHeaders()
     {
-        return $this->response->getHeaders();
+        $headers = $this->response->getHeaders();
+        $result = array();
+        if(!is_array($headers)) {
+            return $result;
+        }
+        foreach ($headers as $part) {
+            $middle=explode(": ",$part,2);
+            $result[trim($middle[0])] = trim($middle[1]);
+        }
+        return $result;
     }
 
     /**
