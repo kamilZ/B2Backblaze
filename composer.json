@@ -24,7 +24,7 @@
     "phpunit/phpunit": "4.8.*"
   },
   "suggest": {
-    "kamilZ/B2Backblaze": "to use with Symfony2",
+    "kamilz/b2backblaze-bundle": "to use with Symfony2",
     "ext-curl": "*"
   },
   "autoload": {

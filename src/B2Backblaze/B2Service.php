@@ -139,7 +139,7 @@ class B2Service
         $this->ensureAuthorized();
         $response = $this->client->b2GetUploadURL($this->apiURL, $this->token, $bucketId);
         if ($response->isOk()) {
-            $response2 = $this->client->b2UploadFile($file, $response->get('uploadUrl'), $this->token, $fileName);
+            $response2 = $this->client->b2UploadFile($file, $response->get('uploadUrl'), $response->get('authorizationToken'), $fileName);
             if ($response2->isOk()) {
                 return $response2->getData();
             }
