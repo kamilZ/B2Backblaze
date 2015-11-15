@@ -226,7 +226,7 @@ class B2API
      */
     public function b2DownloadFileByName($downloadURL, $bucketName, $fileName, $token = null, $metadataOnly = false)
     {
-        $uri = $downloadURL.'/file/'.$bucketName.'/'.urlencode($fileName);
+        $uri = $downloadURL.'/file/'.$bucketName.'/'.$fileName;
         $curl = $this->prepareCurl();
         if (is_null($token)) {
             $curl->setVerifyPeer(false); // ensure it.
