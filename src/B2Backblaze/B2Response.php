@@ -90,7 +90,9 @@ class B2Response
         }
         foreach ($headers as $part) {
             $middle=explode(": ",$part,2);
-            $result[trim($middle[0])] = trim($middle[1]);
+            if(count($middle) == 2){
+                $result[trim($middle[0])] = trim($middle[1]);
+            }
         }
         return $result;
     }
