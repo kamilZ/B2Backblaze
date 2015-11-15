@@ -239,7 +239,7 @@ class B2Service
     {
         $this->ensureAuthorized();
         $response = $this->client->b2DownloadFileByName($this->downloadURL, $bucketName, $fileName, $this->token, true);
-        if (!$response->isOk()) {
+        if (!$response->isOk(false)) {
             return false;
         }
 
