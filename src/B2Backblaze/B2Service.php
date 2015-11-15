@@ -153,14 +153,15 @@ class B2Service
      *
      * @param String $bucketName
      * @param String $fileName
+     * @param bool   $private
      *
      * @return bool
      */
-    public function delete($bucketName, $fileName)
+    public function delete($bucketName, $fileName, $private = false)
     {
-        $data = $this->get($bucketName, $fileName, false, true);
+        $data = $this->get($bucketName, $fileName, $private, true);
         if ($data !== false && array_key_exists('X-Bz-File-Id', $data['headers'])) {
-            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['X-Bz-File-Id'], $fileName);
+            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['headers']['X-Bz-File-Id'], $fileName);
 
             return $response->isOk();
         }
