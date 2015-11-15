@@ -177,12 +177,13 @@ class B2Service
      * @param String $fileName
      * @param String $targetBucketId
      * @param String $newFileName
+     * @param bool   $private
      *
      * @return bool
      */
-    public function rename($bucketName, $bucketId, $fileName, $targetBucketId, $newFileName)
+    public function rename($bucketName, $bucketId, $fileName, $targetBucketId, $newFileName, $private = false)
     {
-        $data = $this->get($bucketName, $fileName, false, false);
+        $data = $this->get($bucketName, $fileName, $private, false);
         if (is_array($data) && array_key_exists('X-Bz-File-Id', $data['headers'])) {
             $result = $this->insert($targetBucketId, $data['content'], $newFileName);
             if ($result === false) {
