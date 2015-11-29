@@ -14,6 +14,8 @@ class B2Service
     protected $apiURL;
     protected $downloadURL;
     protected $token;
+    protected $uploadURL;
+    protected $downloadToken;
 
     /**
      * @param String $account_id      The B2 account id for the account
@@ -137,13 +139,20 @@ class B2Service
     public function insert($bucketId, $file, $fileName)
     {
         $this->ensureAuthorized();
-        $response = $this->client->b2GetUploadURL($this->apiURL, $this->token, $bucketId);
-        if ($response->isOk()) {
-            $response2 = $this->client->b2UploadFile($file, $response->get('uploadUrl'), $response->get('authorizationToken'), $fileName);
-            if ($response2->isOk()) {
-                return $response2->getData();
+        if(!$this->downloadToken || !$this->uploadURL){
+            $response = $this->client->b2GetUploadURL($this->apiURL, $this->token, $bucketId);
+            if ($response->isOk()) {
+                $this->downloadToken = $response->get('authorizationToken');
+                $this->uploadURL     = $response->get('uploadUrl');
+            }else{
+                return false;
             }
         }
+        $response2 = $this->client->b2UploadFile($file, $this->uploadURL, $this->downloadToken, $fileName);
+        if ($response2->isOk()) {
+            return $response2->getData();
+        }
+
 
         return false;
     }
