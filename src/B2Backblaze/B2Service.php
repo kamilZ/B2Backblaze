@@ -181,6 +181,19 @@ class B2Service
         $response2 = $this->client->b2UploadFile($file, $this->uploadURL, $this->downloadToken, $fileName);
         if ($response2->isOk()) {
             return $response2->getData();
+        }else{
+            // b2_get_upload_url returns an upload authorization token. This token lasts at most 24 hours.
+            // However, it is only valid to upload data to one storage pod. If that pod is offline, full or overloaded,
+            // a request to b2_upload_file again.
+            $response = $this->client->b2GetUploadURL($this->apiURL, $this->token, $bucketId);
+            if ($response->isOk()) {
+                $this->downloadToken = $response->get('authorizationToken');
+                $this->uploadURL     = $response->get('uploadUrl');
+                $this->client->b2UploadFile($file, $this->uploadURL, $this->downloadToken, $fileName);
+                if ($response2->isOk()) {
+                    return $response2->getData();
+                }
+            }
         }
 
 
