@@ -126,6 +126,36 @@ class B2Service
     }
 
     /**
+     * Get ZipArchive files
+     * TODO: tests
+     *
+     * @param $bucketName
+     * @param array $filesName
+     * @param $zipFileName
+     * @param bool $private
+     * @return bool
+     */
+    public function getAllZip($bucketName, array $filesName, $zipFileName, $private = false){
+        $zip = new \ZipArchive();
+        if ($zip->open($zipFileName, \ZipArchive::CREATE) === true) {
+            foreach ($filesName as $file) {
+                $content = $this->get($bucketName,$file,$private,false);
+                if($content !== false){
+                    try{
+                        $zip->addFromString($file, $content["content"]);
+                    }catch (\Exception $e){
+                        return false;
+                    }
+                }
+            }
+            $zip->close();
+        }else{
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Inserts file and returns array of file metadata.
      *
      * @param String $bucketId
