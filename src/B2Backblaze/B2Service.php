@@ -212,8 +212,8 @@ class B2Service
     public function delete($bucketName, $fileName, $private = false)
     {
         $data = $this->get($bucketName, $fileName, $private, true);
-        if ($data !== false && array_key_exists('X-Bz-File-Id', $data['headers'])) {
-            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['headers']['X-Bz-File-Id'], $fileName);
+        if ($data !== false && array_key_exists('x-bz-file-id', $data['headers'])) {
+            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['headers']['x-bz-file-id'], $fileName);
 
             return $response->isOk();
         }
@@ -236,12 +236,12 @@ class B2Service
     public function rename($bucketName, $bucketId, $fileName, $targetBucketId, $newFileName, $private = false)
     {
         $data = $this->get($bucketName, $fileName, $private, false);
-        if (is_array($data) && array_key_exists('X-Bz-File-Id', $data['headers'])) {
+        if (is_array($data) && array_key_exists('x-bz-file-id', $data['headers'])) {
             $result = $this->insert($targetBucketId, $data['content'], $newFileName);
             if ($result === false) {
                 return false;
             }
-            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['headers']['X-Bz-File-Id'], $fileName);
+            $response = $this->client->b2DeleteFileVersion($this->apiURL, $this->token, $data['headers']['x-bz-file-id'], $fileName);
 
             return $response->isOk();
         }
@@ -297,7 +297,7 @@ class B2Service
             return false;
         }
 
-        return $response->getHeader('X-Bz-File-Name') == $fileName;
+        return $response->getHeader('x-bz-file-name') == $fileName;
     }
 
     private function isAuthorized()
