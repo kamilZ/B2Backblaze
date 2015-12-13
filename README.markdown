@@ -61,7 +61,7 @@ $client->insert($bucketId, $file, $fileName)
 //Delete last file version
 $client->delete($bucketName, $fileName, $private = false)
 
-//Check if file exist in bucket
+//Rename file in bucket
 $client->rename($bucketName, null, $fileName, $targetBucketId, $newFileName, $private = false)
 
 //Returns the list of files in bucket.
