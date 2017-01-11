@@ -43,7 +43,7 @@ $client = new B2Service($account_id, $application_key);
 //Authenticate with server. Anyway, all methods will ensure the authorization.
 $client->authorize()
 
-//Check if file exist in bucket
+// Returns true if bucket exists
 $client->isBucketExist($bucketId)
 
 //Returns the bucket information array.
@@ -67,8 +67,8 @@ $client->rename($bucketName, null, $fileName, $targetBucketId, $newFileName, $pr
 //Returns the list of files in bucket.
 $client->all($bucketId)
 
-// Returns true if bucket exist
-$client->exist($bucketName, $fileName)
+//Check if the file exists in a bucket
+$client->exists($bucketId, $fileName)
 
 ```
 
