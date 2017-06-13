@@ -289,15 +289,15 @@ class B2Service
      *
      * @return bool
      */
-    public function exists($bucketName, $fileName)
+    public function exists($bucketId, $fileName)
     {
         $this->ensureAuthorized();
-        $response = $this->client->b2DownloadFileByName($this->downloadURL, $bucketName, $fileName, $this->token, true);
+        $response = $this->client->b2ListFileNames($this->apiURL, $this->token, $bucketId, $fileName, 1);
         if (!$response->isOk(false)) {
             return false;
         }
 
-        return $response->getHeader('x-bz-file-name') == $fileName;
+        return $response->get('files')[0]['fileName'] === $fileName;
     }
 
     private function isAuthorized()
