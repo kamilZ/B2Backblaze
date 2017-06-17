@@ -58,6 +58,9 @@ $client->getAllZip($bucketName, array $filesName, $zipFileName, $private = false
 //Inserts file and returns array of file metadata.
 $client->insert($bucketId, $file, $fileName)
 
+//Insert large file
+$client->insertLarge($bucketId, $filePath, $fileName)
+
 //Delete last file version
 $client->delete($bucketName, $fileName, $private = false)
 
@@ -67,8 +70,11 @@ $client->rename($bucketName, null, $fileName, $targetBucketId, $newFileName, $pr
 //Returns the list of files in bucket.
 $client->all($bucketId)
 
-//Check if the file exists in a bucket
-$client->exists($bucketId, $fileName)
+//Check if the file exists (Internally: We are making a HEAD request, not downloading the file only the response headers, so is less expensive than the query with "existInList". Transactions Class B)
+$client->exists($bucketName, $fileName)
+
+//Check if the file exists in a bucket (Internally: Transactions Class C)
+$client->existsInList($bucketId, $fileName)
 
 ```
 

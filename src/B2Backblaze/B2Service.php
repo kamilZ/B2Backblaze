@@ -326,12 +326,12 @@ class B2Service
      * Check if the filename exists.
      *
      *
-     * @param String $bucketName
+     * @param String $bucketId
      * @param String $fileName
      *
      * @return bool
      */
-    public function exists($bucketId, $fileName)
+    public function existsInList($bucketId, $fileName)
     {
         $this->ensureAuthorized();
         $response = $this->client->b2ListFileNames($this->apiURL, $this->token, $bucketId, $fileName, 1);
@@ -341,6 +341,25 @@ class B2Service
 
         return $response->get('files')[0]['fileName'] === $fileName;
     }
+
+    /**
+     * Check if the filename exists, we are using metadata query (HEAD), so we are not downloading the file.
+     *
+     * @param String $bucketName
+     * @param String $fileName
+     *
+     * @return bool
+     */
+    public function exists($bucketName, $fileName)
+    {
+        $this->ensureAuthorized();
+        $response = $this->client->b2DownloadFileByName($this->downloadURL, $bucketName, $fileName, $this->token, true);
+        if (!$response->isOk(false)) {
+            return false;
+        }
+        return $response->getHeader('x-bz-file-name') == $fileName;
+    }
+
 
     private function isAuthorized()
     {
