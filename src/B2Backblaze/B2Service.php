@@ -16,6 +16,7 @@ class B2Service
     protected $token;
     protected $uploadURL;
     protected $downloadToken;
+    protected $minimumPartSize;
 
     /**
      * @param String $account_id      The B2 account id for the account
@@ -29,6 +30,7 @@ class B2Service
         $this->apiURL = null;
         $this->downloadURL = null;
         $this->token = null;
+        $this->minimumPartSize = 100 * (1000 * 1000);
     }
 
     /**
@@ -43,6 +45,7 @@ class B2Service
             $this->apiURL = $response->get('apiUrl');
             $this->token = $response->get('authorizationToken');
             $this->downloadURL = $response->get('downloadUrl');
+            $this->minimumPartSize = $response->get('minimumPartSize');
 
             return true;
         }
@@ -196,7 +199,46 @@ class B2Service
             }
         }
 
+        return false;
+    }
 
+    /**
+     * Inserts large file and returns array of file metadata.
+     * Large files can range in size from 5MB to 10TB.
+     * Each large file must consist of at least 2 parts, and all of the parts except the last one must be at least 5MB in size.
+     * The last part must contain at least one byte.
+     *
+     * @param String $bucketId
+     * @param mixed  $filePath
+     * @param String $fileName
+     *
+     * @return array|bool|null
+     *
+     * @throws B2Exception
+     */
+    public function insertLarge($bucketId, $filePath, $fileName)
+    {
+        $this->ensureAuthorized();
+        // start large file:
+        $startResponse = $this->client->b2StartLargeFile($this->apiURL, $this->token, $bucketId, $fileName);
+        $fileId = $startResponse->get("fileId");
+        try{
+            // get upload url for part file:
+            $uploadUrlResponse = $this->client->b2GetUploadPartURL($this->apiURL, $this->token, $fileId);
+            // upload large file:
+            $responses = $this->client->b2UploadPart($uploadUrlResponse->get("uploadUrl"), $uploadUrlResponse->get("authorizationToken"), $filePath);
+            $sha1s = [];
+            foreach($responses as $response){
+                $sha1s[] = $response->get("contentSha1");
+            }
+            // finish large file
+            $response = $this->client->b2FinishLargeFile($this->apiURL, $this->token, $fileId, $sha1s);
+            if($response->isOk()){
+                return $response->getData();
+            }
+        }catch (B2Exception $exception){
+            $this->client->b2CancelLargeFile($this->apiURL, $this->token, $fileId);
+        }
         return false;
     }
 
