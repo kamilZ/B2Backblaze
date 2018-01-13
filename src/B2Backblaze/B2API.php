@@ -778,7 +778,7 @@ class B2API
         $curl = $this->prepareCurl();
         $browser = new Browser($curl);
         $payload = array(
-            'fileId' => $bucketId,
+            'buckedId' => $bucketId,
             'fileName' => $fileName,
             'contentType' => $contentType,
         );
